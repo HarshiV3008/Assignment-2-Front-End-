@@ -1,54 +1,165 @@
-// Writing a function to communicate with our local server
+document.addEventListener("DOMContentLoaded", () => {
+  M.Modal.init(document.querySelectorAll(".modal"));
+  M.Dropdown.init(document.querySelectorAll(".dropdown-trigger"));
+  fetchItems();
+});
 
-const getMessages = async () => {
-  const resultElement = document.getElementById("result");
-  resultElement.textContent = "Loading...";
-
+// Fetch and display items with optional sorting
+async function fetchItems(store = "") {
   try {
-    const response = await fetch(`/api/messages`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    let url = "/api/items";
+    if (store) {
+      url += `?place=${store}`; // Append place filter to API request
+    }
+    
+    const response = await fetch(url);
+    const items = await response.json();
+    renderItems(items);
+  } catch (error) {
+    console.error("Fetch Error:", error);
+  }
+}
 
-    if (!response.ok) {
-      throw new Error(`Error: ${response.status}`);
+
+document.getElementById("submitItem").addEventListener("click", async () => {
+  const name = document.getElementById("itemName").value;
+  const quantity = document.getElementById("itemQuantity").value;
+  const place = document.getElementById("itemPlace").value;
+
+  await fetch(`/api/items`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name, quantity, place })
+  });
+
+  fetchItems();
+  M.Modal.getInstance(document.getElementById("addItemModal")).close();
+});
+
+// Search for items
+document.getElementById("searchBtn").addEventListener("click", async () => {
+  const query = document.getElementById("search").value;
+  const response = await fetch(`/api/items?search=${query}`);
+  const items = await response.json();
+  renderItems(items);
+});
+
+
+// Render shopping items
+function renderItems(items) {
+  const itemList = document.getElementById("itemList");
+  itemList.innerHTML = ""; // Clear the list
+
+  // Group items by store
+  const groupedItems = items.reduce((groups, item) => {
+    if (!groups[item.place]) {
+      groups[item.place] = [];
+    }
+    groups[item.place].push(item);
+    return groups;
+  }, {});
+
+  // Render each group separately
+  for (const [store, storeItems] of Object.entries(groupedItems)) {
+    const storeHeader = document.createElement("h5");
+    storeHeader.textContent = store;
+    storeHeader.className = "store-header"; // Custom styling if needed
+    itemList.appendChild(storeHeader);
+
+    storeItems.forEach((item) => {
+      const li = document.createElement("li");
+      li.className = "collection-item";
+      li.innerHTML = `
+        ${item.name} <strong>(${item.quantity})</strong>
+        <button class="btn-small blue right" onclick="openEditModal(${item.id}, '${item.name}', ${item.quantity}, '${item.place}')">EDIT</button>
+        <button class="btn-small red right" onclick="deleteItem(${item.id})">DELETE</button>
+      `;
+      itemList.appendChild(li);
+    });
+  }
+}
+
+
+
+  // Search items and show results in modal
+  document.getElementById("searchBtn").addEventListener("click", async () => {
+    const query = document.getElementById("searchName").value.trim();
+    console.log(query);
+
+
+    if (!query) {
+      alert("Please enter a search term.");
+      return;
     }
 
-    const data = await response.json();
-    resultElement.innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
-  } catch (error) {
-    resultElement.textContent = `Error: ${error.message}`;
+    // if (!query) return;
+    try {
+      const response = await fetch(`/api/items?search=${query}`);
+      const results = await response.json();
+
+      const searchResultsList = document.getElementById("searchResults");
+      searchResultsList.innerHTML = "";
+
+      if (results.length === 0) {
+        searchResultsList.innerHTML = "<li class='collection-item'>No results found</li>";
+      } else {
+        results.forEach(item => {
+          const li = document.createElement("li");
+          li.className = "collection-item";
+          li.textContent = `${item.name} (${item.quantity}) - ${item.place}`;
+          searchResultsList.appendChild(li);
+        });
+      }
+
+      M.Modal.getInstance(document.getElementById("searchModal")).open();
+    } catch (error) {
+      console.error("Search Error:", error);
+    }
+  });
+
+  // Delete item
+  async function deleteItem(id) {
+    await fetch(`/api/items/${id}`, { method: "DELETE" });
+    fetchItems();
   }
-};
 
-const postMessage = async () => {
-  const resultElement = document.getElementById("result");
-  resultElement.textContent = "Loading...";
+  // Open Edit Modal and pre-fill data
+  function openEditModal(id, name, quantity, place) {
+    document.getElementById("editItemId").value = id;
+    document.getElementById("editItemName").value = name;
+    document.getElementById("editItemQuantity").value = quantity;
+    document.getElementById("editItemPlace").value = place;
 
-  try {
-    const response = await fetch(`/api/new_message`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ message: "If you can see this POST is working :)" }),
-    });
+    M.Modal.getInstance(document.getElementById("editItemModal")).open();
+  }
 
-    if (!response.ok) {
-      throw new Error(`Error: ${response.status}`);
+  document.getElementById("updateItem").addEventListener("click", async () => {
+    const id = document.getElementById("editItemId").value;
+    const name = document.getElementById("editItemName").value;
+    const quantity = document.getElementById("editItemQuantity").value;
+    const place = document.getElementById("editItemPlace").value;
+
+    if (!id || !name || !quantity || !place) {
+      alert("Please fill in all fields.");
+      return;
     }
 
-    const data = await response.json();
-    resultElement.innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
-  } catch (error) {
-    resultElement.textContent = `Error: ${error.message}`;
-  }
-};
+    try {
+      await fetch(`/api/items/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, quantity, place }),
+      });
 
-document
-  .getElementById("callFunction")
-  .addEventListener("click", getMessages);
+      fetchItems(); // Refresh item list after update
+      M.Modal.getInstance(document.getElementById("editItemModal")).close(); // Close modal
+    } catch (error) {
+      console.error("Update Error:", error);
+    }
+  });
 
-// To begin try adding another button to use the postMessage function
+  document.getElementById("filterStore").addEventListener("change", () => {
+    const selectedStore = document.getElementById("filterStore").value;
+    fetchItems(selectedStore);
+  });
+  

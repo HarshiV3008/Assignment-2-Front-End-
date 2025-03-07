@@ -3,40 +3,73 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Task 2 Starter Template</title>
+  <title>Shopping List</title>
 
-  <!-- Google Icons & Materialize CSS -->
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <link type="text/css" rel="stylesheet" href="css/materialize.min.css" media="screen,projection"/>
-
   <link rel="stylesheet" href="styles.css">
 </head>
 <body class="container">
+  <h4 class="center-align">Shopping List</h4>
+
+    <!-- Edit Item Modal -->
+    <div id="editItemModal" class="modal">
+      <div class="modal-content">
+        <h5>Edit Item</h5>
+        <input type="hidden" id="editItemId">
+        <input type="text" id="editItemName" placeholder="Item name">
+        <input type="number" id="editItemQuantity" placeholder="Quantity">
+        <input type="text" id="editItemPlace" placeholder="Place">
+      </div>
+      <div class="modal-footer">
+        <button id="updateItem" class="btn blue">Update</button>
+        <button class="modal-close btn red">Cancel</button>
+      </div>
+    </div>
 
   <div class="row">
-    <div class="col s12 m8 offset-m2">
-      <div class="card">
-        <div class="card-content">
-          <span class="card-title center-align">Task 2 Starter Template</span>
-          <p class="center-align">Click the button to fetch messages from the server.</p>
-        </div>
-        <div class="card-action center-align">
-          <button id="callFunction" class="btn waves-effect waves-light blue">
-            <i class="material-icons left">cloud_download</i> Fetch Messages
-          </button>
-        </div>
-      </div>
-      
-      <div class="card">
-        <div class="card-content">
-          <h6>Results</h6>
-          <div id="result" class="card-panel grey lighten-4">Results will appear here...</div>
-        </div>
-      </div>
+    <input type="text" id="searchName" placeholder="Search item" class="input-field col s6">
+    <button id="searchBtn" class="btn blue">Search</button>
+  </div>
+
+
+  <select id="filterStore" class="browser-default">
+    <option value="">Show All</option>
+  </select>
+  
+  <!-- Search Results Modal -->
+  <div id="searchModal" class="modal">
+    <div class="modal-content">
+      <h5>Search Results</h5>
+      <ul id="searchResults" class="collection"></ul>
+    </div>
+    <div class="modal-footer">
+      <button class="modal-close btn red">Close</button>
+    </div>
+  </div>
+  
+
+  <button id="openAddModal" class="btn green modal-trigger" href="#addItemModal">
+    <i class="material-icons left">add</i> Add Item
+  </button>
+
+  <ul id="itemList" class="collection"></ul>
+
+  <!-- Add Item Modal -->
+  <div id="addItemModal" class="modal">
+    <div class="modal-content">
+      <h5>Add Item</h5>
+      <input type="text" id="itemName" placeholder="Item name">
+      <input type="number" id="itemQuantity" placeholder="Quantity">
+      <input type="text" id="itemPlace" placeholder="Place">
+    </div>
+    <div class="modal-footer">
+      <button id="submitItem" class="btn green">Submit</button>
+      <button id="resetForm" class="btn grey">Reset</button>
+      <button class="modal-close btn red">Cancel</button>
     </div>
   </div>
 
-  <!-- Materialize JavaScript -->
   <script src="js/materialize.min.js"></script>
   <script src="client.js"></script>
 </body>
