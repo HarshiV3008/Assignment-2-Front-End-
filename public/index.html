@@ -1,31 +1,36 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Shopping List</title>
 
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-  <link type="text/css" rel="stylesheet" href="css/materialize.min.css" media="screen,projection"/>
+  <link type="text/css" rel="stylesheet" href="css/materialize.min.css" media="screen,projection" />
   <link rel="stylesheet" href="styles.css">
 </head>
+
 <body class="container">
   <h4 class="center-align">Shopping List</h4>
 
-    <!-- Edit Item Modal -->
-    <div id="editItemModal" class="modal">
-      <div class="modal-content">
-        <h5>Edit Item</h5>
-        <input type="hidden" id="editItemId">
-        <input type="text" id="editItemName" placeholder="Item name">
-        <input type="number" id="editItemQuantity" placeholder="Quantity">
-        <input type="text" id="editItemPlace" placeholder="Place">
-      </div>
-      <div class="modal-footer">
-        <button id="updateItem" class="btn blue">Update</button>
-        <button class="modal-close btn red">Cancel</button>
-      </div>
+  <button id="clearPurchased" class="btn orange">Clear Purchased Items</button>
+
+
+  <!-- Edit Item Modal -->
+  <div id="editItemModal" class="modal">
+    <div class="modal-content">
+      <h5>Edit Item</h5>
+      <input type="hidden" id="editItemId">
+      <input type="text" id="editItemName" placeholder="Item name">
+      <input type="number" id="editItemQuantity" placeholder="Quantity">
+      <input type="text" id="editItemPlace" placeholder="Place">
     </div>
+    <div class="modal-footer">
+      <button id="updateItem" class="btn blue">Update</button>
+      <button class="modal-close btn red">Cancel</button>
+    </div>
+  </div>
 
   <div class="row">
     <input type="text" id="searchName" placeholder="Search item" class="input-field col s6">
@@ -36,7 +41,7 @@
   <select id="filterStore" class="browser-default">
     <option value="">Show All</option>
   </select>
-  
+
   <!-- Search Results Modal -->
   <div id="searchModal" class="modal">
     <div class="modal-content">
@@ -47,7 +52,7 @@
       <button class="modal-close btn red">Close</button>
     </div>
   </div>
-  
+
 
   <button id="openAddModal" class="btn green modal-trigger" href="#addItemModal">
     <i class="material-icons left">add</i> Add Item
@@ -73,4 +78,5 @@
   <script src="js/materialize.min.js"></script>
   <script src="client.js"></script>
 </body>
+
 </html>

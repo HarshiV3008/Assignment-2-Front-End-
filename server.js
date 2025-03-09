@@ -1,4 +1,4 @@
-const express = require("express");
+const express = require("express"); 
 const cors = require("cors");
 const dotenv = require("dotenv");
 
@@ -58,7 +58,7 @@ app.post("/api/items", async (req, res) => {
         Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ name, quantity, place }),
+      body: JSON.stringify({ name, quantity, place, purchased: false }),
     });
 
     if (!response.ok) throw new Error(`Supabase Error: ${response.statusText}`);
@@ -70,11 +70,11 @@ app.post("/api/items", async (req, res) => {
   }
 });
 
-// PUT update item
+// PUT update item (including purchased status)
 app.put("/api/items/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, quantity, place } = req.body;
+    const { name, quantity, place, purchased } = req.body;
 
     const response = await fetch(`${SUPABASE_URL}/functions/v1/shopping`, {
       method: "PUT",
@@ -82,7 +82,7 @@ app.put("/api/items/:id", async (req, res) => {
         Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ id, name, quantity, place }),
+      body: JSON.stringify({ id, name, quantity, place, purchased }),
     });
 
     if (!response.ok) throw new Error(`Supabase Error: ${response.statusText}`);
@@ -111,6 +111,27 @@ app.delete("/api/items/:id", async (req, res) => {
     if (!response.ok) throw new Error(`Supabase Error: ${response.statusText}`);
 
     res.json({ success: true, message: "Item deleted!" });
+  } catch (error) {
+    console.error("DELETE request error:", error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// DELETE all purchased items
+app.delete("/api/items/clearPurchased", async (req, res) => {
+  try {
+    const response = await fetch(`${SUPABASE_URL}/functions/v1/shopping`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ purchased: true }),
+    });
+
+    if (!response.ok) throw new Error(`Supabase Error: ${response.statusText}`);
+
+    res.json({ success: true, message: "Purchased items cleared!" });
   } catch (error) {
     console.error("DELETE request error:", error);
     res.status(500).json({ error: error.message });

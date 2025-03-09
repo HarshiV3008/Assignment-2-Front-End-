@@ -11,7 +11,7 @@ async function fetchItems(store = "") {
     if (store) {
       url += `?place=${store}`; // Append place filter to API request
     }
-    
+
     const response = await fetch(url);
     const items = await response.json();
     renderItems(items);
@@ -26,6 +26,11 @@ document.getElementById("submitItem").addEventListener("click", async () => {
   const quantity = document.getElementById("itemQuantity").value;
   const place = document.getElementById("itemPlace").value;
 
+  if (!name || !quantity || !place) {
+    alert("Please fill in all fields.");
+    return;
+  }
+
   await fetch(`/api/items`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -34,6 +39,7 @@ document.getElementById("submitItem").addEventListener("click", async () => {
 
   fetchItems();
   M.Modal.getInstance(document.getElementById("addItemModal")).close();
+  alert("Item successfully added!");
 });
 
 // Search for items
@@ -48,9 +54,8 @@ document.getElementById("searchBtn").addEventListener("click", async () => {
 // Render shopping items
 function renderItems(items) {
   const itemList = document.getElementById("itemList");
-  itemList.innerHTML = ""; // Clear the list
+  itemList.innerHTML = ""; // Clear list before re-rendering
 
-  // Group items by store
   const groupedItems = items.reduce((groups, item) => {
     if (!groups[item.place]) {
       groups[item.place] = [];
@@ -59,18 +64,20 @@ function renderItems(items) {
     return groups;
   }, {});
 
-  // Render each group separately
   for (const [store, storeItems] of Object.entries(groupedItems)) {
     const storeHeader = document.createElement("h5");
     storeHeader.textContent = store;
-    storeHeader.className = "store-header"; // Custom styling if needed
+    storeHeader.className = "store-header";
     itemList.appendChild(storeHeader);
 
     storeItems.forEach((item) => {
       const li = document.createElement("li");
       li.className = "collection-item";
       li.innerHTML = `
-        ${item.name} <strong>(${item.quantity})</strong>
+        <label>
+          <input type="checkbox" ${item.purchased ? "checked" : ""} onchange="togglePurchased(${item.id}, this.checked)">
+          <span class="${item.purchased ? 'completed' : ''}">${item.name} <strong>(${item.quantity})</strong></span>
+        </label>
         <button class="btn-small blue right" onclick="openEditModal(${item.id}, '${item.name}', ${item.quantity}, '${item.place}')">EDIT</button>
         <button class="btn-small red right" onclick="deleteItem(${item.id})">DELETE</button>
       `;
@@ -80,86 +87,125 @@ function renderItems(items) {
 }
 
 
+async function togglePurchased(id, isChecked) {
+  try {
+    await fetch(`/api/items/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ purchased: isChecked }),
+    });
 
-  // Search items and show results in modal
-  document.getElementById("searchBtn").addEventListener("click", async () => {
-    const query = document.getElementById("searchName").value.trim();
-    console.log(query);
-
-
-    if (!query) {
-      alert("Please enter a search term.");
-      return;
-    }
-
-    // if (!query) return;
-    try {
-      const response = await fetch(`/api/items?search=${query}`);
-      const results = await response.json();
-
-      const searchResultsList = document.getElementById("searchResults");
-      searchResultsList.innerHTML = "";
-
-      if (results.length === 0) {
-        searchResultsList.innerHTML = "<li class='collection-item'>No results found</li>";
-      } else {
-        results.forEach(item => {
-          const li = document.createElement("li");
-          li.className = "collection-item";
-          li.textContent = `${item.name} (${item.quantity}) - ${item.place}`;
-          searchResultsList.appendChild(li);
-        });
-      }
-
-      M.Modal.getInstance(document.getElementById("searchModal")).open();
-    } catch (error) {
-      console.error("Search Error:", error);
-    }
-  });
-
-  // Delete item
-  async function deleteItem(id) {
-    await fetch(`/api/items/${id}`, { method: "DELETE" });
     fetchItems();
+  } catch (error) {
+    console.error("Error updating purchased status:", error);
+  }
+}
+
+// Clear all purchased items
+document.getElementById("clearPurchased").addEventListener("click", async () => {
+  if (!confirm("Are you sure you want to remove all purchased items?")) {
+    return;
   }
 
-  // Open Edit Modal and pre-fill data
-  function openEditModal(id, name, quantity, place) {
-    document.getElementById("editItemId").value = id;
-    document.getElementById("editItemName").value = name;
-    document.getElementById("editItemQuantity").value = quantity;
-    document.getElementById("editItemPlace").value = place;
+  try {
+    await fetch(`/api/items/clearPurchased`, { method: "DELETE" });
+    fetchItems();
+    alert("Purchased items cleared!");
+  } catch (error) {
+    console.error("Error clearing purchased items:", error);
+  }
+});
 
-    M.Modal.getInstance(document.getElementById("editItemModal")).open();
+
+
+// Search items and show results in modal
+document.getElementById("searchBtn").addEventListener("click", async () => {
+  const query = document.getElementById("searchName").value.trim();
+  console.log(query);
+
+
+  if (!query) {
+    alert("Please enter a search term.");
+    return;
   }
 
-  document.getElementById("updateItem").addEventListener("click", async () => {
-    const id = document.getElementById("editItemId").value;
-    const name = document.getElementById("editItemName").value;
-    const quantity = document.getElementById("editItemQuantity").value;
-    const place = document.getElementById("editItemPlace").value;
+  // if (!query) return;
+  try {
+    const response = await fetch(`/api/items?search=${query}`);
+    const results = await response.json();
 
-    if (!id || !name || !quantity || !place) {
-      alert("Please fill in all fields.");
-      return;
-    }
+    const searchResultsList = document.getElementById("searchResults");
+    searchResultsList.innerHTML = "";
 
-    try {
-      await fetch(`/api/items/${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, quantity, place }),
+    if (results.length === 0) {
+      searchResultsList.innerHTML = "<li class='collection-item'>No results found</li>";
+    } else {
+      results.forEach(item => {
+        const li = document.createElement("li");
+        li.className = "collection-item";
+        li.textContent = `${item.name} (${item.quantity}) - ${item.place}`;
+        searchResultsList.appendChild(li);
       });
-
-      fetchItems(); // Refresh item list after update
-      M.Modal.getInstance(document.getElementById("editItemModal")).close(); // Close modal
-    } catch (error) {
-      console.error("Update Error:", error);
     }
-  });
 
-  document.getElementById("filterStore").addEventListener("change", () => {
-    const selectedStore = document.getElementById("filterStore").value;
-    fetchItems(selectedStore);
-  });
-  
+    M.Modal.getInstance(document.getElementById("searchModal")).open();
+  } catch (error) {
+    console.error("Search Error:", error);
+  }
+});
+
+// Delete item
+async function deleteItem(id) {
+  if (!confirm("Are you sure you want to delete this item?")) {
+    return;
+  }
+  await fetch(`/api/items/${id}`, { method: "DELETE" });
+  fetchItems();
+  alert("Item successfully deleted!");
+}
+
+// Open Edit Modal and pre-fill data
+function openEditModal(id, name, quantity, place) {
+  document.getElementById("editItemId").value = id;
+  document.getElementById("editItemName").value = name;
+  document.getElementById("editItemQuantity").value = quantity;
+  document.getElementById("editItemPlace").value = place;
+
+  M.Modal.getInstance(document.getElementById("editItemModal")).open();
+}
+
+document.getElementById("updateItem").addEventListener("click", async () => {
+  const id = document.getElementById("editItemId").value;
+  const name = document.getElementById("editItemName").value;
+  const quantity = document.getElementById("editItemQuantity").value;
+  const place = document.getElementById("editItemPlace").value;
+
+  if (!id || !name || !quantity || !place) {
+    alert("Please fill in all fields.");
+    return;
+  }
+
+  // Confirmation before update
+  if (!confirm("Are you sure you want to update this item?")) {
+    return;
+  }
+
+  try {
+    await fetch(`/api/items/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, quantity, place }),
+    });
+
+    fetchItems(); // Refresh item list after update
+    M.Modal.getInstance(document.getElementById("editItemModal")).close(); // Close modal
+    alert("Item successfully updated!");
+  } catch (error) {
+    console.error("Update Error:", error);
+  }
+});
+
+document.getElementById("filterStore").addEventListener("change", () => {
+  const selectedStore = document.getElementById("filterStore").value;
+  fetchItems(selectedStore);
+});
