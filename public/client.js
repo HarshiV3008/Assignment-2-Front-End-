@@ -44,7 +44,7 @@ document.getElementById("submitItem").addEventListener("click", async () => {
 
 // Search for items
 document.getElementById("searchBtn").addEventListener("click", async () => {
-  const query = document.getElementById("search").value;
+  const query = document.getElementById("searchName").value;
   const response = await fetch(`/api/items?search=${query}`);
   const items = await response.json();
   renderItems(items);
@@ -74,12 +74,20 @@ function renderItems(items) {
       const li = document.createElement("li");
       li.className = "collection-item";
       li.innerHTML = `
+        <div>
         <label>
           <input type="checkbox" ${item.purchased ? "checked" : ""} onchange="togglePurchased(${item.id}, this.checked)">
           <span class="${item.purchased ? 'completed' : ''}">${item.name} <strong>(${item.quantity})</strong></span>
         </label>
-        <button class="btn-small blue right" onclick="openEditModal(${item.id}, '${item.name}', ${item.quantity}, '${item.place}')">EDIT</button>
-        <button class="btn-small red right" onclick="deleteItem(${item.id})">DELETE</button>
+      </div>
+      <div class="item-buttons">
+        <button class="btn-small blue waves-effect" onclick="openEditModal(${item.id}, '${item.name}', ${item.quantity}, '${item.place}')">
+          <i class="material-icons">edit</i>
+        </button>
+        <button class="btn-small red waves-effect" onclick="deleteItem(${item.id})">
+          <i class="material-icons">delete</i>
+        </button>
+      </div>
       `;
       itemList.appendChild(li);
     });
@@ -100,23 +108,6 @@ async function togglePurchased(id, isChecked) {
     console.error("Error updating purchased status:", error);
   }
 }
-
-// Clear all purchased items
-document.getElementById("clearPurchased").addEventListener("click", async () => {
-  if (!confirm("Are you sure you want to remove all purchased items?")) {
-    return;
-  }
-
-  try {
-    await fetch(`/api/items/clearPurchased`, { method: "DELETE" });
-    fetchItems();
-    alert("Purchased items cleared!");
-  } catch (error) {
-    console.error("Error clearing purchased items:", error);
-  }
-});
-
-
 
 // Search items and show results in modal
 document.getElementById("searchBtn").addEventListener("click", async () => {

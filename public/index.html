@@ -1,30 +1,124 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Shopping List</title>
 
+  <!-- Materialize CSS -->
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-  <link type="text/css" rel="stylesheet" href="css/materialize.min.css" media="screen,projection" />
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+  
+  <!-- Custom Styles -->
+  <style>
+    body {
+      background: #f5f5f5;
+    }
+    .container {
+      max-width: 800px;
+      margin: auto;
+    }
+    .card {
+      border-radius: 10px;
+      box-shadow: 2px 4px 10px rgba(0, 0, 0, 0.1);
+    }
+    .shopping-header {
+      font-size: 2rem;
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+    .input-field input {
+      border-radius: 5px;
+    }
+    .btn {
+      border-radius: 5px;
+    }
+    .collection-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 15px;
+    }
+    .completed {
+      text-decoration: line-through;
+      color: gray;
+    }
+    .modal {
+      border-radius: 10px;
+    }
+    .item-buttons {
+      display: flex;
+      gap: 8px;
+    }
+    .btn-small {
+      min-width: 40px;
+    }
+  </style>
 </head>
 
 <body class="container">
-  <h4 class="center-align">Shopping List</h4>
+  <h4 class="shopping-header center-align">🛒 Shopping List</h4>
 
-  <button id="clearPurchased" class="btn orange">Clear Purchased Items</button>
+  <!-- Add Item Button at the Top -->
+  <div class="center-align" style="margin-bottom: 20px;">
+    <button id="openAddModal" class="btn green modal-trigger waves-effect" href="#addItemModal">
+      <i class="material-icons left">add</i> Add Item
+    </button>
+  </div>
 
+  <!-- Search Box -->
+  <div class="row">
+    <div class="input-field col s9">
+      <input type="text" id="searchName" placeholder="Search for an item">
+    </div>
+    <div class="col s3">
+      <button id="searchBtn" class="btn blue waves-effect waves-light">
+        <i class="material-icons left">search</i> Search
+      </button>
+    </div>
+  </div>
+
+  <!-- Shopping List -->
+  <div class="card">
+    <div class="card-content">
+      <ul id="itemList" class="collection"></ul>
+    </div>
+  </div>
+
+  <!-- Add Item Modal -->
+  <div id="addItemModal" class="modal">
+    <div class="modal-content">
+      <h5>Add New Item</h5>
+      <div class="input-field">
+        <input type="text" id="itemName" placeholder="Item Name">
+      </div>
+      <div class="input-field">
+        <input type="number" id="itemQuantity" placeholder="Quantity">
+      </div>
+      <div class="input-field">
+        <input type="text" id="itemPlace" placeholder="Store">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button id="submitItem" class="btn green">Add</button>
+      <button class="modal-close btn red">Cancel</button>
+    </div>
+  </div>
 
   <!-- Edit Item Modal -->
   <div id="editItemModal" class="modal">
     <div class="modal-content">
       <h5>Edit Item</h5>
       <input type="hidden" id="editItemId">
-      <input type="text" id="editItemName" placeholder="Item name">
-      <input type="number" id="editItemQuantity" placeholder="Quantity">
-      <input type="text" id="editItemPlace" placeholder="Place">
+      <div class="input-field">
+        <input type="text" id="editItemName" placeholder="Item Name">
+      </div>
+      <div class="input-field">
+        <input type="number" id="editItemQuantity" placeholder="Quantity">
+      </div>
+      <div class="input-field">
+        <input type="text" id="editItemPlace" placeholder="Store">
+      </div>
     </div>
     <div class="modal-footer">
       <button id="updateItem" class="btn blue">Update</button>
@@ -32,51 +126,8 @@
     </div>
   </div>
 
-  <div class="row">
-    <input type="text" id="searchName" placeholder="Search item" class="input-field col s6">
-    <button id="searchBtn" class="btn blue">Search</button>
-  </div>
-
-
-  <select id="filterStore" class="browser-default">
-    <option value="">Show All</option>
-  </select>
-
-  <!-- Search Results Modal -->
-  <div id="searchModal" class="modal">
-    <div class="modal-content">
-      <h5>Search Results</h5>
-      <ul id="searchResults" class="collection"></ul>
-    </div>
-    <div class="modal-footer">
-      <button class="modal-close btn red">Close</button>
-    </div>
-  </div>
-
-
-  <button id="openAddModal" class="btn green modal-trigger" href="#addItemModal">
-    <i class="material-icons left">add</i> Add Item
-  </button>
-
-  <ul id="itemList" class="collection"></ul>
-
-  <!-- Add Item Modal -->
-  <div id="addItemModal" class="modal">
-    <div class="modal-content">
-      <h5>Add Item</h5>
-      <input type="text" id="itemName" placeholder="Item name">
-      <input type="number" id="itemQuantity" placeholder="Quantity">
-      <input type="text" id="itemPlace" placeholder="Place">
-    </div>
-    <div class="modal-footer">
-      <button id="submitItem" class="btn green">Submit</button>
-      <button id="resetForm" class="btn grey">Reset</button>
-      <button class="modal-close btn red">Cancel</button>
-    </div>
-  </div>
-
-  <script src="js/materialize.min.js"></script>
+  <!-- Materialize JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
   <script src="client.js"></script>
 </body>
-
 </html>
