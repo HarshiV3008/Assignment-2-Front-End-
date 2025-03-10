@@ -195,8 +195,3 @@ document.getElementById("updateItem").addEventListener("click", async () => {
     console.error("Update Error:", error);
   }
 });
-
-document.getElementById("filterStore").addEventListener("change", () => {
-  const selectedStore = document.getElementById("filterStore").value;
-  fetchItems(selectedStore);
-});
