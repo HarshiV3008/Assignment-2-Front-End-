@@ -155,6 +155,12 @@ async function deleteItem(id) {
   alert("Item successfully deleted!");
 }
 
+document.getElementById("resetItem").addEventListener("click", () => {
+  document.getElementById("itemName").value = "";
+  document.getElementById("itemQuantity").value = "";
+  document.getElementById("itemPlace").value = "";
+});
+
 // Open Edit Modal and pre-fill data
 function openEditModal(id, name, quantity, place) {
   document.getElementById("editItemId").value = id;

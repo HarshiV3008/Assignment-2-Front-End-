@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,77 +9,89 @@
   <!-- Materialize CSS -->
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
-  
+
   <!-- Custom Styles -->
   <style>
     body {
-      background: #f5f5f5;
+      background: linear-gradient(to right, #a1c4fd, #c2e9fb);
+      color: #333;
+      font-family: Arial, sans-serif;
     }
+
     .container {
       max-width: 800px;
       margin: auto;
     }
+
     .card {
-      border-radius: 10px;
-      box-shadow: 2px 4px 10px rgba(0, 0, 0, 0.1);
+      border-radius: 15px;
+      box-shadow: 4px 6px 12px rgba(0, 0, 0, 0.2);
     }
+
     .shopping-header {
       font-size: 2rem;
-      font-weight: 600;
-      margin-bottom: 20px;
+      font-weight: bold;
+      color: #fff;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+      text-align: center;
     }
-    .input-field input {
-      border-radius: 5px;
-    }
+
     .btn {
-      border-radius: 5px;
+      border-radius: 10px;
     }
+
     .collection-item {
       display: flex;
       align-items: center;
       justify-content: space-between;
       padding: 15px;
     }
+
     .completed {
       text-decoration: line-through;
       color: gray;
     }
+
     .modal {
-      border-radius: 10px;
+      border-radius: 15px;
     }
+
+    .modal-footer {
+      display: flex;
+      justify-content: space-between;
+    }
+
     .item-buttons {
       display: flex;
-      gap: 8px;
+      gap: 10px;
     }
+
     .btn-small {
-      min-width: 40px;
+      min-width: 45px;
     }
   </style>
 </head>
 
 <body class="container">
-  <h4 class="shopping-header center-align">🛒 Shopping List</h4>
+  <h4 class="shopping-header"><b>Shopping List</b></h4>
 
-  <!-- Add Item Button at the Top -->
   <div class="center-align" style="margin-bottom: 20px;">
-    <button id="openAddModal" class="btn green modal-trigger waves-effect" href="#addItemModal">
+    <button id="openAddModal" class="btn light-blue modal-trigger waves-effect" href="#addItemModal">
       <i class="material-icons left">add</i> Add Item
     </button>
   </div>
 
-  <!-- Search Box -->
   <div class="row">
     <div class="input-field col s9">
-      <input type="text" id="searchName" placeholder="Search for an item">
+      <input type="text" id="searchName" placeholder="Search for an item" style="color: black;">
     </div>
     <div class="col s3">
-      <button id="searchBtn" class="btn blue waves-effect waves-light">
+      <button id="searchBtn" class="btn indigo waves-effect waves-light">
         <i class="material-icons left">search</i> Search
       </button>
     </div>
   </div>
 
-  <!-- Shopping List -->
   <div class="card">
     <div class="card-content">
       <ul id="itemList" class="collection"></ul>
@@ -100,6 +113,7 @@
       </div>
     </div>
     <div class="modal-footer">
+      <button id="resetItem" class="btn yellow black-text">Reset</button>
       <button id="submitItem" class="btn green">Add</button>
       <button class="modal-close btn red">Cancel</button>
     </div>
@@ -130,4 +144,5 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
   <script src="client.js"></script>
 </body>
+
 </html>
